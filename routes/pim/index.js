@@ -1,0 +1,25 @@
+const router = require('koa-router')()
+// const DB = require("../module/db")
+const user = require("./users")
+const task = require("./task")
+const note = require("./note")
+const select = require("./select")
+const mome = require("./memo")
+const address = require("./address")
+const time = require("./time")
+const blog = require("./blog")
+const documet = require("./document")
+
+
+router.use("/user",user)
+router.use("/task",task)
+router.use("/note",note)
+router.use("/select",select)
+router.use("/mome",mome)
+router.use("/address",address)
+router.use("/time",time)
+router.use("/blog",blog)
+router.use("/documet",documet)
+
+
+module.exports = router.routes()
