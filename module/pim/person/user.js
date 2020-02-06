@@ -1,8 +1,7 @@
-const DB = require("../db/db");
+// const DB = require("../../db/db-mongodb");
+const DB = require("../../db/db-mongoose")
 const jwt = require("jsonwebtoken");
-const Crypto =require("../../libs/crypoto")
-
-
+const Crypto =require("../../../libs/crypoto")
 
 module.exports = {
   login: async function(ctx, next) {
@@ -11,39 +10,37 @@ module.exports = {
      * 携带登录返回则
      */
     const { userName, password } = ctx.request.body;
-    
-    let ld = await DB.find("user", { userName });
-    console.log(ld)
-    if(ld===[]||ld.length===0){
-      console.log("可以")
+    let result = await DB.findOne("users", { userName });
+    if(result===null){
       ctx.body={
-        code:10001,
+        code:10011,
         errMsg:"无此账户"
       }
       return
     }
-
-    let _id = ld[0]["_id"];
-    let access =ld[0]['access']
-    let pwd = ld[0]['password']
+    let _id = result["_id"];
+    let access =result['access']
+    let pwd = result['password']
     if(_id!==undefined && Crypto.decode(password)!==pwd){
       ctx.body={
-        code:10002,
+        code:10012,
         errMsg:"密码错误，请重新尝试"
       }
       return
     }
+
+    let payload ={
+      username: userName,
+      id: _id
+    }
+    let secret  ="PimToken"
     
-    // if()
     const token = jwt.sign(
-      {
-        username: userName,
-        id: _id
-      },
-      "PimToken",
-      { expiresIn: "9" }
+       payload,
+       secret,
+      { expiresIn: "10h" }
     );
-    await DB.update("user",{userName},{token})
+    await DB.updateOne("users",{userName},{token})
     ctx.body = {
       code: 0,
       result: {
@@ -55,10 +52,10 @@ module.exports = {
   },
   getUserInfo: async function(ctx, next) {
     let PimToken = ctx.query.token
-    let ld = await DB.find("user",{token:PimToken})
-     if(ld.length===0){
+    let result = await DB.findOne("users",{token:PimToken})
+     if(result.length===0){
        ctx.body={
-         code:10010,
+         code:90002,
          errMsg:"token错误"
        }
        return
@@ -66,18 +63,18 @@ module.exports = {
     ctx.body={
       code:0,
       result:{
-        avatar: ld[0].avatar,
-        nickName: ld[0].nickName,
-        email: ld[0].email,
-        access:ld[0].access,
-        colorTheme: ld[0].colorTheme,
-        backgroundUrl: ld[0].backgroundUrl
+        avatar: result.avatar,
+        nickName: result.nickName,
+        email: result.email,
+        access:result.access,
+        colorTheme: result.colorTheme,
+        backgroundUrl: result.backgroundUrl
       }
     }
   },
   register: async function(ctx, next) {
-    let ld =await DB.find("user",{userName:'xy'})
-    console.log(ld)
+    let result =await DB.find("users",{userName:'xy'})
+    // console.log(result)
     ctx.body="sja"
   },
   editUserInfo: async (ctx, next) => {}

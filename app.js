@@ -7,7 +7,8 @@ const onerror = require("koa-onerror");
 const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
 const index = require("./routes/index");
-const cors = require("koa2-cors");
+const {verifyToken} = require("./libs/token")
+// const cors = require("koa2-cors");
 
 // error handler
 onerror(app);
@@ -45,7 +46,16 @@ app.use(
   //  await next()
   }
 );
-
+/***
+ * 中间件的执行顺序
+ * 123321 ---
+ */
+app.use(
+  async (ctx,next)=>{
+    await verifyToken(ctx,next)  // !!! async await
+    await next()
+  }
+)
 /**
  * 模板引擎
  * 前端用的Vue，这里就不管了
