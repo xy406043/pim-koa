@@ -44,9 +44,38 @@ class Db {
           reject(err);
         });
       } else {
-        console.log("单例");
+        // console.log("单例");
         resolve(_this.dbclient);
       }
+    });
+  }
+
+  /**
+   * @连写查询
+   *@直接在find方法里写好options就行了
+   */
+  where(table, condition, options) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table]
+            .find(condition)
+            .select(options.fields || "")
+            .skip(options.skip || null)
+            .sort(options.sort || {})
+            .limit(options.limit || null)
+            .exec((err, doc) => {
+              if (err) {
+                reject({ code: 1, err: err });
+              } else {
+                resolve({ code: 0, result: doc });
+              }
+            });
+        })
+        .catch(err => {
+          console.log("错误：", err);
+          reject({ code: 2, err: err });
+        });
     });
   }
 
@@ -54,21 +83,21 @@ class Db {
    * @mongoose获取数据库数据
    * @return {Array}
    */
-  find(table, obj = {}) {
+  find(table, obj = {},fields,options) {
     return new Promise((resolve, reject) => {
       this.connect()
         .then(() => {
-          schema[table].find(obj, (err, doc) => {
+          schema[table].find(obj,fields,options, (err, doc) => {
             if (err) {
-              reject(err);
+              reject({ code: 1, err: err });
             } else {
-              resolve(doc);
+              resolve({ code: 0, result: doc });
             }
           });
         })
         .catch(err => {
           console.log("错误：", err);
-          reject(err)
+          reject({ code: 2, err: err });
         });
     });
   }
@@ -78,42 +107,46 @@ class Db {
    * @returns {null 查找}
    * @param {当前不用this.connect 是因为开始时创建实例时已经this.connect连接成功了，除非数据库意外关闭....那我还是加上this.connect吧}
    */
-  findOne(table, obj = {}) {
+  findOne(table, obj = {},fields,options) {
     return new Promise((resolve, reject) => {
-      this.connect().then(() => {
-        schema[table].findOne(obj, (err, doc) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(doc);
-          }
+      this.connect()
+        .then(() => {
+          schema[table].findOne(obj,fields, options,(err, doc) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: doc });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
         });
-      }).catch(err => {
-        console.log("错误：".err)
-        reject(err)
-    })
     });
   }
   /**
    * @根据ID查找
-   * @param {*} table 
-   * @param {*} obj 
+   * @param {*} table
+   * @param {*} obj
    */
-  findById(table,id){
-    return new Promise((resolve,reject)=>{
-      this.connect().then(()=>{
-        schema[table].findById(id,(err,doc)=>{
-          if(err){
-            reject(err)
-          }else{
-            resolve(doc)
-          }
+  findById(table, id,fields,options) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].findById(id,fields, options,(err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
         })
-      }).catch(err => {
-        console.log("错误：".err)
-        reject(err)
-    })
-    })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
   }
 
   /**
@@ -122,64 +155,137 @@ class Db {
    */
   insert(table, obj) {
     return new Promise((resolve, reject) => {
-      this.connect().then(() => {
-        let ins = new schema[table](obj);
-        ins.save((err, docs) => {
-          //   console.timeEnd("time")
-          if (err) {
-            reject(err);
-          } else {
-            resolve(docs);
-          }
+      this.connect()
+        .then(() => {
+          let ins = new schema[table](obj);
+          ins.save((err, docs) => {
+            //   console.timeEnd("time")
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
         });
-      }).catch(err => {
-        console.log("错误：".err)
-        reject(err)
-    })
     });
   }
   /**
    * @向数据库更新数据
    * @return {}
    */
-  updateOne(table, condition, doc) {
+  updateOne(table, condition, options) {
     return new Promise((resolve, reject) => {
-        this.connect().then(() => {
-            schema[table].updateOne(condition,doc,(err,docs) => {
-                if(err){
-                    reject(err)
-                }else{
-                    resolve(docs)
-                }
-            })
-
-        }).catch(err => {
-            console.log("错误：".err)
-            reject(err)
+      this.connect()
+        .then(() => {
+          schema[table].updateOne(condition, options, (err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
         })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+  /**
+   * @根据ID查找并进行更行
+   * @param {*} table
+   * @param {*} id
+   * @param {*} condition
+   */
+  findByIdAndUpdate(table, id, condition, options) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].findByIdAndUpdate(
+            id,
+            condition,
+            options,
+            (err, docs) => {
+              if (err) {
+                reject({ code: 1, err: err });
+              } else {
+                resolve({ code: 0, result: docs });
+              }
+            }
+          );
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+  delete(table, condition) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].deleteMany(condition, (err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
     });
   }
   /**
    * @根据ID进行删除
-   * @param {*} table 
-   * @param {*} id 
-   * @param {*} condition 
+   * @param {*} table
+   * @param {*} id
+   * @param {*} condition
    */
-  deleteById(table,id,condition){
-    return new Promise((resolve,reject)=>{
-      this.connect().then(()=>{
-        schema[table].findByIdAndRemove(id,condition,(err,docs)=>{
-          if(err){
-            reject(err)
-        }else{
-            resolve(docs)
-        }
-        }).catch(err => {
-          console.log("错误：".err)
-          reject(err)
-      })
-      })
-    })
+  deleteById(table, id, condition) {
+    return new Promise((resolve, reject) => {
+      this.connect().then(() => {
+        schema[table]
+          .findByIdAndRemove(id, condition, (err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          })
+          .catch(err => {
+            console.log("错误：".err);
+            reject({ code: 2, err: err });
+          });
+      });
+    });
+  }
+  /**
+   * @计数
+   */
+  count(table, condition) {
+    return new Promise((resolve, reject) => {
+      this.connect().then(() => {
+        schema[table]
+          .countDocuments(condition, (err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          })
+          .catch(err => {
+            console.log("错误：".err);
+            reject({ code: 2, err: err });
+          });
+      });
+    });
   }
 }
 
