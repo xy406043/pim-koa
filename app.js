@@ -8,11 +8,81 @@ const bodyparser = require("koa-bodyparser");
 // const koaBody = require('koa-body');
 const logger = require("koa-logger");
 const index = require("./routes/index");
-const {verifyToken} = require("./libs/token")
+const { verifyToken } = require("./libs/token");
+const socketJs = require("./module/pim/socket")
 // const cors = require("koa2-cors");
 
-onerror(app);
+/**
+ * @建立socket链接
+ */
+const server = require("http").Server(app.callback());
+//挂载socket
+const io = require("socket.io")(server);
+//监听socket连接
+server.listen(4000, () => {
+  console.log("socket连接",4000);
+});
+io.on("connection", socket => {
+  console.log("连接成功",{id:socket.id})
+  //捕获客户端send信息
+  //前端io.send(message)
+  socket.on("notice", async (msg) =>{
+    // console.log("任务通知",msg)
+    setTimeout(()=>{
+        let result =socketJs.sendTodoNotice(msg.value)
+        result.then(res =>{
+          if(res!==0){
+            /**
+             * @不为0发送消息让前端判断
+             */
+            io.sockets.connected[socket.id].emit('getTodoNotice',res) //指定发送
+          }else{
+            /**
+             * @为0让前端继续维持链接
+             */
+            io.sockets.connected[socket.id].emit('getTodoNotice',0) //指定发送
+          }
+        }).catch(err =>{
+          console.log("错误",err)
+        })
+    },7000)
+  });
 
+  //捕获客户端自定义信息
+  //前端io.emit('xxx', message);
+  socket.on("scheduleNotice", async (msg) =>{
+      // socket.emit('user',msg.value) //广播
+      setTimeout(()=>{
+          let result =socketJs.sendNotice(msg.value)
+          result.then(res =>{
+            if(res!==0){
+              /**
+               * @不为0发送消息让前端判断
+               */
+              io.sockets.connected[socket.id].emit('getNotice',res) //指定发送
+            }else{
+              /**
+               * @为0让前端继续维持链接
+               */
+              io.sockets.connected[socket.id].emit('getNotice',0) //指定发送
+            }
+          }).catch(err =>{
+            console.log("错误",err)
+          })
+      },6000)
+  });
+  //监听客户端断开连接
+  socket.on('disconnect', async  ()=> {
+    console.log('连接已经关闭')
+  })
+  setTimeout(()=>{
+    io.sockets.connected[socket.id].emit('getTodoNotice',0) //指定发送
+    io.sockets.connected[socket.id].emit('getNotice',0) //指定发送
+  },1000)
+
+});
+
+onerror(app);
 // middlewares
 app.use(
   bodyparser({
@@ -36,40 +106,38 @@ app.use(json());
 app.use(logger());
 app.use(require("koa-static")(__dirname + "/public"));
 
-
 /***
  * 位置因素，应该是不能放在error之后，在这就可以
  * 注意Access-Control—Allow-Headers里面，在此项目中携带tok嗯，因此Authorization是必须的！！！
  */
-app.use(
-  async (ctx,next) => {
-    // console.log(ctx.header)
-    // let origin = ctx.url
-   ctx.set("Access-Control-Allow-Origin", "*");
-   ctx.set("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
-   ctx.set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild");
-   ctx.set("Content-Type", "application/json;charset=utf-8");
-   ctx.set("Access-Control-Max-Age","300")
-   ctx.set("Access-Control-Allow-Credentials",true)
-   if(ctx.method==='OPTIONS'){
-     ctx.body = {};
-     ctx.status = 200;
-   }else{
-    await  next()
-   }
-  //  await next()
+app.use(async (ctx, next) => {
+  // console.log(ctx.header)
+  // let origin = ctx.url
+  ctx.set("Access-Control-Allow-Origin", "*");
+  ctx.set("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
+  ctx.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild"
+  );
+  ctx.set("Content-Type", "application/json;charset=utf-8");
+  ctx.set("Access-Control-Max-Age", "300");
+  ctx.set("Access-Control-Allow-Credentials", true);
+  if (ctx.method === "OPTIONS") {
+    ctx.body = {};
+    ctx.status = 200;
+  } else {
+    await next();
   }
-);
+  //  await next()
+});
 /***
  * 中间件的执行顺序
  * 123321 ---
  */
-app.use(
-  async (ctx,next)=>{
-    await verifyToken(ctx,next)  // !!! async await
-    await next()
-  }
-)
+app.use(async (ctx, next) => {
+  await verifyToken(ctx, next); // !!! async await
+  await next();
+});
 /**
  * 模板引擎
  * 前端用的Vue，这里就不管了
@@ -77,7 +145,7 @@ app.use(
 // app.use(views(__dirname + '/views', {
 //   extension: 'ejs'                // 这种后缀名必须是ejs
 // }))
-app.use(views("views"), { map: { html: "ejs" } }); //这种必须是HTML
+// app.use(views("views"), { map: { html: "ejs" } }); //这种必须是HTML
 // 监听端口号
 
 // logger
@@ -100,8 +168,6 @@ app.use(index.routes(), index.allowedMethods());
 app.on("error", (err, ctx) => {
   console.error("server error", err, ctx);
 });
-
-
 
 module.exports = app;
 

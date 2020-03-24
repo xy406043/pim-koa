@@ -2,10 +2,20 @@ const router = require('koa-router')()
 const Project = require("../../../module/pim/project/project")
 
 /**
+ * @项目通用
+ */
+router.get("/getProjectOverView",Project.getProjectOverView)
+router.post("/searchProject",Project.searchProject)
+router.get("/getProjectInfo",Project.getProjectInfo)
+router.post("/editProjectInfo",Project.editProjectInfo)
+router.post("/editLabel",Project.editLabel)
+router.post("/deleteLabel",Project.deleteLabel)
+
+/**
  * @项目
  */
 router.post("/addProject",Project.addProject)
-router.get("/getProjectList",Project.getProjectList)
+router.post("/getProjectList",Project.getProjectList)
 router.post("/editProject",Project.editProject)
 router.get("/deleteProject",Project.deleteProject)
 router.get("/getProjectDetail",Project.getProjectDetail)
@@ -15,6 +25,7 @@ router.post("/addTag",Project.addTag)
  */
 router.post('/addTodo',Project.addTodo)
 router.get('/getTodoDetail',Project.getTodoDetail)
+router.post('/getTodoList',Project.getTodoList)
 router.get('/deleteTodo',Project.deleteTodo)
 router.post('/editTodo',Project.editTodo)
 router.post('/changeState',Project.changeState)
@@ -38,4 +49,11 @@ router.get("/deleteSchdeule",Project.deleteSchedule)
 router.post("/getScheduleList",Project.getScheduleList)
 router.get("/getScheduleDetail",Project.getScheduleDetail)
 router.post("/getMonthScheduleList",Project.getMonthScheduleList)
+
+/**
+ * @文件
+ */
+router.post("/addFile",Project.addFile)
+router.post("/getFileList",Project.getFileList)
+router.get("/deleteFile",Project.deleteFile)
 module.exports =router.routes()

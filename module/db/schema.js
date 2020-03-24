@@ -30,6 +30,9 @@ let collection = {
       backgroundUrl: { type: String },
       access: { type: Array, default: ["user"] },
       sex: { type: Number },
+      birthDate:String,
+      nativePlace:Schema.Types.Mixed,
+      realName:String,
       phone: { type: Number, default: null },
       email: { type: String, default: "" },
       address: { type: String, default: "" },
@@ -127,6 +130,7 @@ let collection = {
       remarks: { type: String, default: "" },
       startAt: { type: Date },
       endAt: { type: Date },
+      finishedAt:{type:Date},//任务完成时间
       status: { type: Number, default: 1 }, // 1.待开始 2. 进行中 3暂停中 4.已结束,
       finished: { type: Boolean, default: false },
       collected: { type: Boolean, default: false }
@@ -147,6 +151,7 @@ let collection = {
     {
       ObjectId: Schema.Types.ObjectId,
       project_id: Schema.Types.ObjectId,
+      user_id:Schema.Types.ObjectId,
       name: String,
       description: { type: String, default: "" },
       archived: { type: Boolean, default: false },
@@ -400,15 +405,50 @@ let collection = {
     {
       ObjectId:Schema.Types.ObjectId,
       user_id:Schema.Types.ObjectId,
-      name:String,
+      name:String,  //是文件的上传名，返回的链接就是这个
       type:String,
       size:Number,
-      fileUrl:String
+      fileUrl:String,
+      /**
+       * @以下为任务集内容标识
+       */
+      showName:String,//展示的文件名
+      project_id:Schema.Types.ObjectId
+
     },
     {
       versionKey: false,
       index: true,
       collection: "folder",
+      timestamps: {
+        createdAt: true,
+        updatedAt: true
+      }
+    }
+  ),
+   /**
+   * @网站右上角消息通知   
+   * @如果有后台管理系统的话倒是可以发送通知
+   * @但是目前仅有这个就没有必要了
+   */
+  notify: new Schema(
+    {
+      ObjectId:Schema.Types.ObjectId,
+      user_id:Schema.Types.ObjectId,
+      schedule_id:Schema.Types.ObjectId,
+      todo_id:Schema.Types.ObjectId,
+      title:String,
+      content:String,
+      sendTime:Date,
+      read:{  //该通知是否已经被阅读
+        type:Boolean,
+        default:false
+      }
+    },
+    {
+      versionKey: false,
+      index: true,
+      collection: "notify",
       timestamps: {
         createdAt: true,
         updatedAt: true
@@ -435,4 +475,5 @@ module.exports = {
   cases: mongoose.model("cases", collection["cases"]),
   codebook: mongoose.model("codebook", collection["codebook"]),
   folder: mongoose.model("folder", collection["folder"]),
+  notify: mongoose.model("notify", collection["notify"]),
 };

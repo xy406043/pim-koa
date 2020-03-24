@@ -2,7 +2,7 @@ const DB = require("../../db/db-mongoose");
 const Crypto = require("../../../libs/crypoto");
 
 module.exports={
-    getCodeList: async ctx =>{
+    getCodeList: async  (ctx,next) =>{
         let {pageSize,currentPage,selectCode} = ctx.request.body
         let condition ={
             user_id:ctx.user.user_id
@@ -22,7 +22,7 @@ module.exports={
             currentPage:currentPage
         }
     },
-    addCode: async ctx =>{
+    addCode: async  (ctx,next) =>{
 
         let {affiliation,accountList,remarks} =ctx.request.body
         let p ={
@@ -38,7 +38,7 @@ module.exports={
             result:""
         }
     },
-    editCode: async ctx =>{
+    editCode: async  (ctx,next) =>{
         let {code_id,affiliation,accountList,remarks} =ctx.request.body
         let p={
             affiliation,
@@ -51,7 +51,7 @@ module.exports={
             result:""
         }
     },
-    deleteCode: async ctx =>{
+    deleteCode: async  (ctx,next) =>{
         let id= ctx.query.id
         await DB.deleteById("codebook",id)
         ctx.body={

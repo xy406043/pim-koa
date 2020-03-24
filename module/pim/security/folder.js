@@ -2,11 +2,24 @@ const DB = require("../../db/db-mongoose");
 const Crypto = require("../../../libs/crypoto");
 
 module.exports={
-    getFileList: async ctx =>{
+    getFileList: async  (ctx,next) =>{
+        let {sortBy} = ctx.request.body
         let condition ={
-            user_id:ctx.user.user_id
+            user_id:ctx.user.user_id,
+            project_id:{$exists:false}
         }
-        let options={}
+        let options={
+        }
+        if(sortBy===1){
+            options.sort={
+                type:1
+            }
+        }else if(sortBy===2){
+            options.sort={
+                size:1
+            }
+        }
+        console.log("条阿金",options)
         let result =(await DB.where("folder",condition,options)).result
         ctx.body={
             code:0,
@@ -14,11 +27,12 @@ module.exports={
         }
 
     },
-    addFile: async ctx =>{
-         let {name,size,type,fileUrl} =ctx.request.body
+    addFile: async  (ctx,next) =>{
+         let {name,showName,size,type,fileUrl} =ctx.request.body
          let p={
              user_id:ctx.user.user_id,
              name,
+             showName,
              size,
              type,
              fileUrl

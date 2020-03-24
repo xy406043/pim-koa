@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 
 module.exports ={
-    addNote: async ctx => {
+    addNote: async  (ctx,next) => {
         let p =ctx.request.body
         let data ={
             title: p.title,
@@ -17,7 +17,7 @@ module.exports ={
             result:""
         }
     },
-    getNoteList: async ctx => {
+    getNoteList: async  (ctx,next) => {
         let pageSize=ctx.request.body.pageSize
         let currentPage =ctx.request.body.currentPage
         let p ={
@@ -66,7 +66,7 @@ module.exports ={
             currentPage:currentPage
         }
     },
-    deleteNote: async ctx => {
+    deleteNote: async  (ctx,next) => {
           let id =ctx.query.id
           await DB.deleteById("notes",id)
           ctx.body={
@@ -74,7 +74,7 @@ module.exports ={
             result:""
         }
     },
-    editNote: async ctx =>{
+    editNote: async  (ctx,next) =>{
         let p =ctx.request.body
         let data ={
             title: p.title,
@@ -88,7 +88,7 @@ module.exports ={
         }
 
     },
-    getNoteDetail: async ctx => {
+    getNoteDetail: async  (ctx,next) => {
         let id =ctx.query.id
         let result = (await DB.findById("notes",id)).result
         ctx.body={
@@ -96,7 +96,7 @@ module.exports ={
             result:result
         }
     },
-    getLimitNote: async ctx =>{
+    getLimitNote: async  (ctx,next) =>{
         let id= ctx.user.user_id
         let options ={
             limit:ctx.request.body.limit,

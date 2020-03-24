@@ -2,7 +2,7 @@ const DB = require("../../db/db-mongoose");
 const mongoose = require("mongoose");
 
 module.exports = {
-  addBookMark: async ctx => {
+  addBookMark: async (ctx,next)=> {
     let p = {
       user_id: ctx.user.user_id,
       title: ctx.request.body.title,
@@ -16,7 +16,7 @@ module.exports = {
       result: ""
     };
   },
-  editBookMarking: async ctx =>{
+  editBookMarking: async (ctx,next)=>{
       let id =ctx.request.body.bookMarking_id
       let p={
         title: ctx.request.body.title,
@@ -31,7 +31,7 @@ module.exports = {
 
   },
   // 获取相关分类下所有的链接
-  getBookMarkList: async ctx => {
+  getBookMarkList: async (ctx,next)=> {
 
       let condition ={
           user_id:ctx.user.user_id
@@ -63,7 +63,7 @@ module.exports = {
       result: result
     };
   },
-  getLimitBookMark: async ctx => {
+  getLimitBookMark: async (ctx,next)=> {
     let id = ctx.user.user_id;
     let options = {
       limit: ctx.request.body.limit,
@@ -83,7 +83,7 @@ module.exports = {
       };
     }
   },
-  deleteBookMarking: async ctx =>{
+  deleteBookMarking: async (ctx,next)=>{
       let id =ctx.query.id
       await DB.deleteById("bookmarkings",id)
       ctx.body={

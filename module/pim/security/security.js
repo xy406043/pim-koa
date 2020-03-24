@@ -2,7 +2,7 @@
 const DB = require("../../db/db-mongoose");
 const Crypto = require("../../../libs/crypoto");
 module.exports ={
-    getSecondCode: async ctx=>{
+    getSecondCode: async  (ctx,next) =>{
         let id =ctx.user.user_id
         let result =(await DB.findById("users",id)).result
         ctx.body={
@@ -12,7 +12,7 @@ module.exports ={
             }
         }
     },
-    addSecondCode:async  ctx=>{
+    addSecondCode:async   (ctx,next) =>{
        let pass =ctx.request.body.password
        console.log(pass)
        let user_id =ctx.user.user_id
@@ -22,7 +22,7 @@ module.exports ={
            result:""
        }
     },
-    verifyCode: async ctx =>{
+    verifyCode: async  (ctx,next) =>{
         let pass =ctx.request.body.password
         let user_id =ctx.user.user_id
         let result =(await DB.findById("users",user_id)).result

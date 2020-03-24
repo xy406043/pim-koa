@@ -174,7 +174,7 @@ class Db {
     });
   }
   /**
-   * @向数据库更新数据
+   * @向数据库更新一条数据
    * @return {}
    */
   updateOne(table, condition, options) {
@@ -182,6 +182,28 @@ class Db {
       this.connect()
         .then(() => {
           schema[table].updateOne(condition, options, (err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+  /**
+   * @向数据库更新数据
+   * @return {}
+   */
+  updateMany(table, condition, options) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].updateMany(condition, options, (err, docs) => {
             if (err) {
               reject({ code: 1, err: err });
             } else {

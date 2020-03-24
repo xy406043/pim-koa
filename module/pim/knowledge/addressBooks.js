@@ -1,7 +1,7 @@
 const DB = require("../../db/db-mongoose");
 
 module.exports = {
-  addAddress: async ctx => {
+  addAddress: async  (ctx,next) => {
       let p ={
           name:ctx.request.body.name,
           user_id:ctx.user.user_id,
@@ -17,8 +17,8 @@ module.exports = {
         result: ""
       };
   },
-  getAddressDetail: async ctx => {},
-  getAddressList: async ctx =>{
+  getAddressDetail: async  (ctx,next) => {},
+  getAddressList: async  (ctx,next) =>{
       let pageSize = ctx.request.body.pageSize
        let currentPage = ctx.request.body.currentPage
       let condition={
@@ -43,7 +43,7 @@ module.exports = {
           totalCount:count
       }
   },
-  editAddress: async ctx => {
+  editAddress: async  (ctx,next) => {
       let id= ctx.request.body.id
       let p ={
           name:ctx.request.body.name,
@@ -61,7 +61,7 @@ module.exports = {
     }
     
   },
-  deleteAddress: async ctx => {
+  deleteAddress: async  (ctx,next) => {
       let id =ctx.query.id
       const result =(await DB.deleteById("addressBooks",id)).result
       console.log(result)
@@ -70,7 +70,7 @@ module.exports = {
           result:""
       }
   },
-  getLimitAddress: async ctx =>{
+  getLimitAddress: async  (ctx,next) =>{
     let id= ctx.user.user_id
     let options ={
         limit:ctx.request.body.limit,
