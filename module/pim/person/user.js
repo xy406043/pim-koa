@@ -247,7 +247,7 @@ module.exports = {
       email,
       colorTheme:"grayblue",
       sex:0,
-      backgroundUrl:"http://xynagisa.xyz/1584457638513.png",
+      backgroundUrl:"http://xynagisa.xyz/1584985785325.png",
       avatar:"http://xynagisa.xyz/share1.png",
       password: Crypto.decode(password)
     });

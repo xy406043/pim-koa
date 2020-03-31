@@ -583,7 +583,7 @@ module.exports = {
         name: todoList.name,
         projectName: project.projectName,
         project_id: todoList.project_id,
-        description: todoList.name,
+        description: todoList.description,
         archived: todoList.archived, // 是否归档
         updatedAt: todoList.updatedAt,
         createdAt: todoList.createdAt,

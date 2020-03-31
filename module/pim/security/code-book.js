@@ -24,11 +24,12 @@ module.exports={
     },
     addCode: async  (ctx,next) =>{
 
-        let {affiliation,accountList,remarks} =ctx.request.body
+        let {affiliation,accountUrl,accountList,remarks} =ctx.request.body
         let p ={
             affiliation,
             accountList,
             remarks,
+            accountUrl,
             user_id:ctx.user.user_id
         }
         await DB.insert("codebook",p)
@@ -39,10 +40,11 @@ module.exports={
         }
     },
     editCode: async  (ctx,next) =>{
-        let {code_id,affiliation,accountList,remarks} =ctx.request.body
+        let {code_id,affiliation,accountUrl,accountList,remarks} =ctx.request.body
         let p={
             affiliation,
             accountList,
+            accountUrl,
             remarks
         }
         await DB.findByIdAndUpdate("codebook",code_id,p)

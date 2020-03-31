@@ -21,7 +21,8 @@ module.exports = {
       let p={
         title: ctx.request.body.title,
         url: ctx.request.body.url,
-        imgUrl: ctx.request.body.imgUrl
+        imgUrl: ctx.request.body.imgUrl,
+        group_id:ctx.request.body.group_id
       }
       await DB.findByIdAndUpdate("bookmarkings",id,p)
       ctx.body={

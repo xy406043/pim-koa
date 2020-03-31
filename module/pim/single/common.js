@@ -77,7 +77,7 @@ module.exports = {
           group_id: item._id
         };
         let a = JSON.parse(JSON.stringify(item));
-        item.count = (await DB.count("bookmarkings", condition)).result;
+        a.count = (await DB.count("bookmarkings", condition)).result;
         tel.push(a);
       }
     }
@@ -172,7 +172,6 @@ module.exports = {
      */
     let project = (await DB.find("projects", { user_id: user_id })).result;
     let list = (await DB.find("todolist", { user_id: user_id })).result;
-    console.log(list);
     let parent_todo = (
       await DB.find("todos", {
         user_id: user_id,

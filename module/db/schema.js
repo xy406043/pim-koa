@@ -383,6 +383,7 @@ let collection = {
       ObjectId:Schema.Types.ObjectId,
       user_id:Schema.Types.ObjectId,
       affiliation:String, //账号 从属
+      accountUrl:String,//账号Url
       accountList:Array,
       remarks:""    //备注
 
