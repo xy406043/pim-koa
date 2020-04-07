@@ -19,6 +19,7 @@ class Db {
     let _this = this;
     return new Promise((resolve, reject) => {
       if (!this.dbClient) {      //解决数据库多次连接的问题
+        console.log("开始")
         mongo.connect(
           config.dbUrl,
           { useUnifiedTopology: true },
@@ -42,10 +43,12 @@ class Db {
   //查
   find(collectionName, json) {
     return new Promise((resolve, reject) => {
+      console.time("a")
       this.connect()
         .then(db => {
           let result = db.collection(collectionName).find(json); //查找集合
           result.toArray((err, docs) => {
+            console.timeEnd("a")
             if (err) {
               reject(err);
             }
