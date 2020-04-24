@@ -2,6 +2,7 @@ const router = require("koa-router")();
 const note = require("../../../module/pim/knowledge/note");
 const bill = require("../../../module/pim/knowledge/bill");
 const label = require("../../../module/pim/knowledge/label");
+const blog = require("../../../module/pim/knowledge/blog")
 const bookMarking = require("../../../module/pim/knowledge/bookMarkings");
 const addressBook = require("../../../module/pim/knowledge/addressBooks");
 
@@ -15,13 +16,6 @@ router.get("/deleteNote",note.deleteNote)
 router.post("/editNote",note.editNote)
 router.post("/getLimitNote",note.getLimitNote)
 
-/**
- * @账单
- */
-
-/**
- * @便签
- */
 /**
  * @网址收藏
  */
@@ -40,4 +34,14 @@ router.post("/getAddressList",addressBook.getAddressList)
 router.get("/getAddressDetail",addressBook.getAddressDetail)
 router.post("/getLimitAddress",addressBook.getLimitAddress)
 
+/**
+ * @博客文章
+ */
+router.post("/getBlogList",blog.getBlogList)
+router.post("/addBlog",blog.addBlog)
+router.post("/editBlog",blog.editBlog)
+router.get("/deleteBlog",blog.deleteBlog)
+router.post("/getLimitBlog",blog.getLimitBlog)
+router.post("/addBlogTag",blog.addBlogTag)
+router.post("/editBlogTag",blog.editBlogTag)
 module.exports = router.routes();

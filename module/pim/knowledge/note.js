@@ -26,7 +26,7 @@ module.exports ={
             sort:{updatedAt:-1}
         }
         let options ={
-            user_id:ctx.user.user_id
+            user_id:new mongoose.Types.ObjectId(ctx.user.user_id)
         }
         console.log(ctx.request.body)
         //morning分类
@@ -56,7 +56,28 @@ module.exports ={
             options.title={$regex:title}
         }
         console.log(options)
-        let result =(await DB.where("notes",options,p)).result
+        let populate= "group_id"
+        /**
+         * @aggregate管道严格按顺序执行
+         */
+        let aggregate =[
+            {
+                $lookup:{from:"group",localField:"group_id",foreignField:"_id",as:"groupInfo"}
+            },
+            {
+                $match:options
+            },
+            {
+                $sort:p.sort
+            },
+            {
+                $skip:p.skip
+            },
+            {
+                $limit:p.limit
+            }
+        ]
+        let result =(await DB.where3("notes",options,p,aggregate)).result
         let count =(await DB.count("notes",options)).result
         ctx.body={
             code:0,
