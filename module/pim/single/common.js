@@ -81,6 +81,20 @@ module.exports = {
         tel.push(a);
       }
     }
+   /**
+    * @博客管理
+    */
+    if (p.groupType === 3) {
+      for (let item of result) {
+        let condition = {
+          user_id: ctx.user.user_id,
+          group_id: item._id
+        };
+        let a = JSON.parse(JSON.stringify(item));
+        a.count = (await DB.count("blog", condition)).result;
+        tel.push(a);
+      }
+    }
     ctx.body = {
       code: 0,
       result: tel

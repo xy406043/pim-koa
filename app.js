@@ -11,7 +11,10 @@ const index = require("./routes/index");
 const { verifyToken } = require("./libs/token");
 const socketJs = require("./module/pim/socket")
 // const cors = require("koa2-cors");
-
+const history = require('./middleware/koa2-connect-history-api-fallback')
+app.use(history({
+verbose: true//打出转发日志
+}));
 /**
  * @建立socket链接
  */
@@ -104,7 +107,7 @@ app.use(
 // }));
 app.use(json());
 app.use(logger());
-app.use(require("koa-static")(__dirname + "/public"));
+app.use(require("koa-static")(__dirname + "/public/dist"));
 
 /***
  * 位置因素，应该是不能放在error之后，在这就可以
@@ -147,6 +150,7 @@ app.use(async (ctx, next) => {
 // }))
 // app.use(views("views"), { map: { html: "ejs" } }); //这种必须是HTML
 // 监听端口号
+//app.listen(3000)
 
 // logger
 app.use(async (ctx, next) => {

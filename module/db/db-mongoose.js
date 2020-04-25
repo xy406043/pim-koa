@@ -78,6 +78,58 @@ class Db {
         });
     });
   }
+  /**
+   * @pupulate查询
+   */
+  where2(table, condition, options,populate) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table]
+            .find(condition)
+            .select(options.fields || "")
+            .skip(options.skip || null)
+            .sort(options.sort || {})
+            .limit(options.limit || null)
+            .populate(populate || null)
+            .exec((err, doc) => {
+              if (err) {
+                reject({ code: 1, err: err });
+              } else {
+                resolve({ code: 0, result: doc });
+              }
+            });
+        })
+        .catch(err => {
+          console.log("错误：", err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+  /**
+   * @aggregate查询
+   */
+  where3(table,aggregate) {
+    console.log(aggregate)
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table]
+          .aggregate(aggregate || [])
+            .exec((err, doc) => {
+              if (err) {
+                reject({ code: 1, err: err });
+              } else {
+                resolve({ code: 0, result: doc });
+              }
+            });
+        })
+        .catch(err => {
+          console.log("错误：", err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
 
   /**
    * @mongoose获取数据库数据
@@ -135,6 +187,29 @@ class Db {
       this.connect()
         .then(() => {
           schema[table].findById(id,fields, options,(err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+    /**
+   * @根据ID查找加入populate
+   * @param {*} table
+   * @param {*} obj
+   */
+  findById2(table, id,fields,options,populate) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].findById(id,fields, options).populate(populate|| null).exec((err, docs) => {
             if (err) {
               reject({ code: 1, err: err });
             } else {
@@ -309,6 +384,50 @@ class Db {
       });
     });
   }
+  
+    /**
+     * @高级操纵封装关联
+   * @关联查找aggregate 
+   * @这是MongoDB写法不是schema写法
+   * @params {options}
+   */
+  relateFind(table,options_list){
+        return new Promise((resolve,reject)=>{
+          this.connect().then(()=>{
+            schema[table].aggregrate(options_list).exec((err,docs)=>{
+              if(err){
+                reject({code:1,err:err})
+              }else{
+                resolve({code:0,result:docs})
+              }
+            })
+            .catch(error =>{
+              console.log("错误：".err);
+              reject({ code: 2, err: err });
+            })
+          })
+        })
+  }
+  /** 
+   * @populate查询
+  */
+  populateFind(table,condition={},fields,options,potion){
+    return new Promise((resolve,reject)=>{
+      this.connect().then(()=>{
+        schema[table].find(condition,fields,options).populate(potion).exec((err,docs)=>{
+          if(err){
+            reject({code:1,err:err})
+          }else{
+            resolve({code:0,result:docs})
+          }
+        })
+        .catch(error =>{
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        })
+      })
+    })
+}
 }
 
 module.exports = Db.getInstance();

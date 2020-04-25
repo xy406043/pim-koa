@@ -12,7 +12,7 @@ module.exports = {
     console.log(id);
     // 总任务数目
     let condition = {
-      project_id: id
+      project_id: id,
     };
     let totalCount = (await DB.count("todos", condition)).result;
     //未安排任务  没有截止时间
@@ -20,8 +20,8 @@ module.exports = {
       project_id: id,
       $or: [
         { endAt: { $exists: false } },
-        { endAt: { $exists: true, $eq: null } }
-      ]
+        { endAt: { $exists: true, $eq: null } },
+      ],
     };
     let unschedule = (await DB.count("todos", condition1)).result;
     //进行中任务
@@ -30,34 +30,34 @@ module.exports = {
       $or: [
         {
           startAt: {
-            $lte: new Date()
+            $lte: new Date(),
           },
           endAt: {
-            $gte: new Date()
-          }
+            $gte: new Date(),
+          },
         },
         {
           startAt: {
-            $exists: false
+            $exists: false,
           },
           endAt: {
-            $gte: new Date()
-          }
-        }
-      ]
+            $gte: new Date(),
+          },
+        },
+      ],
     };
     let ondoing = (await DB.count("todos", condition2)).result;
     //已完成任务
     let condition3 = {
       project_id: id,
-      status: 4
+      status: 4,
     };
     let finished = (await DB.count("todos", condition3)).result;
     //已延误任务
     let condition4 = {
       project_id: id,
       endAt: { $lt: new Date() },
-      status: { $ne: 4 }
+      status: { $ne: 4 },
     };
     let delaying = (await DB.count("todos", condition4)).result;
     ctx.body = {
@@ -67,15 +67,15 @@ module.exports = {
         unschedule,
         ondoing,
         finished,
-        delaying
-      }
+        delaying,
+      },
     };
   },
-  searchProject: async (ctx,next) => {},
+  searchProject: async (ctx, next) => {},
   /**
    * @任务集基础信息设置项目
    */
-  getProjectInfo: async (ctx,next) => {
+  getProjectInfo: async (ctx, next) => {
     let id = ctx.query.id;
     let result = (await DB.findById("projects", id)).result;
     for (let item of result.tags) {
@@ -86,28 +86,28 @@ module.exports = {
        */
       let condition = {
         project_id: id,
-        tags: { $elemMatch: item }
+        tags: { $elemMatch: item },
       };
       item.count = (await DB.count("todos", condition)).result;
     }
     ctx.body = {
       code: 0,
-      result: result
+      result: result,
     };
   },
-  editProjectInfo: async (ctx,next) => {
+  editProjectInfo: async (ctx, next) => {
     let { project_id, projectName, description } = ctx.request.body;
     let condition = { projectName, description };
     await DB.findByIdAndUpdate("projects", project_id, condition);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
   /**
    * @descriiption 编辑任务集的标签，所有使用此标签的任务都要进行改变
    */
-  editLabel: async (ctx,next) => {
+  editLabel: async (ctx, next) => {
     let { project_id, nowValue, color, originValue } = ctx.request.body;
     let tags = (await DB.findById("projects", project_id)).result.tags;
     for (let item of tags) {
@@ -122,35 +122,35 @@ module.exports = {
      */
     let condition = {
       project_id: project_id,
-      tags: { value: originValue, color: color }
+      tags: { value: originValue, color: color },
     };
     let options = {
-      $set: { "tags.$": { value: nowValue, color: color } }
+      $set: { "tags.$": { value: nowValue, color: color } },
     };
     await DB.updateMany("todos", condition, options);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  deleteLabel: async (ctx,next) => {
+  deleteLabel: async (ctx, next) => {
     /**
      * @同上
      * @options的pull进行筛选删除
      */
     let { project_id, value, color } = ctx.request.body;
     let options = {
-      $pull: { tags: { value: value } }
+      $pull: { tags: { value: value } },
     };
     await DB.findByIdAndUpdate("projects", project_id, options);
 
     let condition = {
-      project_id: project_id
+      project_id: project_id,
     };
     await DB.updateMany("todos", condition, options);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
   /**
@@ -160,13 +160,13 @@ module.exports = {
     let projectName = ctx.request.body.projectName;
     let data = {
       projectName,
-      user_id: ctx.user.user_id
+      user_id: ctx.user.user_id,
     };
     let result = await DB.insert("projects", data);
     if (result.code === 0) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     }
   },
@@ -181,41 +181,41 @@ module.exports = {
     if (result.code === 0) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     }
   },
-  editProject: async (ctx,next) => {
+  editProject: async (ctx, next) => {
     let id = ctx.request.body.id;
     let p = {
-      collected: ctx.request.body.collected
+      collected: ctx.request.body.collected,
     };
     await DB.findByIdAndUpdate("projects", id, p);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
   /**
    * @获取项目列表
    */
-  getProjectList: async (ctx,next) => {
+  getProjectList: async (ctx, next) => {
     // 查找！！
     let condition = {
-      user_id: ctx.user.user_id
+      user_id: ctx.user.user_id,
     };
     let title = new RegExp(ctx.request.body.selectTitle, "i");
     if (ctx.request.body.selectTitle) {
       condition.projectName = { $regex: title };
     }
     let options = {
-      sort: { collected: -1 }
+      sort: { collected: -1 },
     };
     console.log(user_id, options);
     let result = (await DB.where("projects", condition, options)).result;
     ctx.body = {
       code: 0,
-      result: result
+      result: result,
     };
   },
   /**
@@ -236,13 +236,13 @@ module.exports = {
         {
           project_id: id,
           list_id: { $exists: false },
-          parent_todo: { $exists: false }
+          parent_todo: { $exists: false },
         },
         { sort: { status: 1 } }
       )
     ).result;
     all_todo["offList"] = {
-      todoList: todo
+      todoList: todo,
     };
     //清单任务
     /**
@@ -255,7 +255,7 @@ module.exports = {
           "todos",
           {
             list_id: item._id,
-            parent_todo: { $exists: false }
+            parent_todo: { $exists: false },
           },
           { sort: { status: 1 } }
         )
@@ -263,7 +263,7 @@ module.exports = {
       all_todo[item.name] = {
         list_id: item._id,
         description: item.description,
-        todoList: every_list
+        todoList: every_list,
       };
     }
 
@@ -291,8 +291,8 @@ module.exports = {
         description: result.description,
         todoList: all_todo,
         scheduleList: schedule,
-        fileList: fileList
-      }
+        fileList: fileList,
+      },
     };
   },
   /**
@@ -309,7 +309,7 @@ module.exports = {
     if (result) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     }
   },
@@ -324,11 +324,11 @@ module.exports = {
     if (result.code === 0) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     }
   },
-  getTodoDetail: async (ctx,next) => {
+  getTodoDetail: async (ctx, next) => {
     let id = ctx.query.id;
     let todo = (await DB.findById("todos", id)).result;
     let project = (await DB.findById("projects", todo.project_id)).result;
@@ -364,18 +364,18 @@ module.exports = {
           parent_todo: todo.parent_todo,
           listName: todolist !== null ? todolist.name : null,
           childTodos: childTodos,
-          collected: todo.collected
-        }
+          collected: todo.collected,
+        },
       };
     }
   },
   /**
    * @所有任务的筛选器
    */
-  getTodoList: async (ctx,next) => {
+  getTodoList: async (ctx, next) => {
     let id = ctx.user.user_id;
     let { todoType } = ctx.request.body;
-    let all_result =[]
+    let all_result = [];
     let project = (await DB.find("projects", { user_id: user_id })).result;
     function getProjectName(id) {
       /**
@@ -395,61 +395,61 @@ module.exports = {
         status: 1,
         $or: [
           { endAt: { $exists: false } },
-          { endAt: { $exists: true, $eq: null } }
-        ]
+          { endAt: { $exists: true, $eq: null } },
+        ],
       };
       let result = (await DB.find("todos", condition)).result;
-      for(let item of result){
-        let  p={
-          user_id:user_id,
-          parent_todo:item._id
-        }
-        let child =(await DB.find("todos",p)).result
+      for (let item of result) {
+        let p = {
+          user_id: user_id,
+          parent_todo: item._id,
+        };
+        let child = (await DB.find("todos", p)).result;
         all_result.push({
-          _id:item._id,
-          name:item.name,
-          project_id:item.project_id,
-          projectName:getProjectName(item.project_id),
-          createdAt:item.createdAt,
-          startAt:item.startAt,
-          endAt:item.endAt,
-          child:child
-        })
+          _id: item._id,
+          name: item.name,
+          project_id: item.project_id,
+          projectName: getProjectName(item.project_id),
+          createdAt: item.createdAt,
+          startAt: item.startAt,
+          endAt: item.endAt,
+          child: child,
+        });
       }
       ctx.body = {
         code: 0,
         result: all_result,
-        todoType:todoType
+        todoType: todoType,
       };
     }
     if (todoType === 2) {
       //已延误任务
       let condition = {
         user_id: id,
-        endAt: { $exists: true, $gte: new Date() }
+        endAt: { $exists: true, $gte: new Date() },
       };
       let result = (await DB.find("todos", condition)).result;
-      for(let item of result){
-        let  p={
-          user_id:user_id,
-          parent_todo:item._id
-        }
-        let child =(await DB.find("todos",p)).result
+      for (let item of result) {
+        let p = {
+          user_id: user_id,
+          parent_todo: item._id,
+        };
+        let child = (await DB.find("todos", p)).result;
         all_result.push({
-          _id:item._id,
-          name:item.name,
-          project_id:item.project_id,
-          projectName:getProjectName(item.project_id),
-          createdAt:item.createdAt,
-          endAt:item.endAt,
-          startAt:item.startAt,
-          child:child
-        })
+          _id: item._id,
+          name: item.name,
+          project_id: item.project_id,
+          projectName: getProjectName(item.project_id),
+          createdAt: item.createdAt,
+          endAt: item.endAt,
+          startAt: item.startAt,
+          child: child,
+        });
       }
       ctx.body = {
         code: 0,
         result: all_result,
-        todoType:todoType
+        todoType: todoType,
       };
     }
     if (todoType === 3) {
@@ -458,30 +458,30 @@ module.exports = {
       let weekEnd = new Date(moment().endOf("week"));
       let condition = {
         user_id: id,
-        endAt: { $exists: true, $gte: weekStart, $lte: weekEnd }
+        endAt: { $exists: true, $gte: weekStart, $lte: weekEnd },
       };
       let result = (await DB.find("todos", condition)).result;
-      for(let item of result){
-        let  p={
-          user_id:user_id,
-          parent_todo:item._id
-        }
-        let child =(await DB.find("todos",p)).result
+      for (let item of result) {
+        let p = {
+          user_id: user_id,
+          parent_todo: item._id,
+        };
+        let child = (await DB.find("todos", p)).result;
         all_result.push({
-          _id:item._id,
-          name:item.name,
-          project_id:item.project_id,
-          projectName:getProjectName(item.project_id),
-          createdAt:item.createdAt,
-          startAt:item.startAt,
-          endAt:item.endAt,
-          child:child
-        })
+          _id: item._id,
+          name: item.name,
+          project_id: item.project_id,
+          projectName: getProjectName(item.project_id),
+          createdAt: item.createdAt,
+          startAt: item.startAt,
+          endAt: item.endAt,
+          child: child,
+        });
       }
       ctx.body = {
         code: 0,
         result: all_result,
-        todoType:todoType
+        todoType: todoType,
       };
     }
   },
@@ -491,33 +491,33 @@ module.exports = {
     if (result.code === 0) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     }
   },
-  editTodo: async (ctx,next) => {
+  editTodo: async (ctx, next) => {
     let id = ctx.request.body.id;
     let data = ctx.request.body.data;
     await DB.findByIdAndUpdate("todos", id, data);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  changeState: async (ctx,next) => {
+  changeState: async (ctx, next) => {
     let todo_id = ctx.request.body.todo_id;
     let status = ctx.request.body.status;
     console.log("cahngeS", status);
     let DB_res = await DB.findByIdAndUpdate("todos", todo_id, {
-      status: status
+      status: status,
     });
     console.log("DB", DB_res);
     ctx.body = {
       code: 0,
-      status: ""
+      status: "",
     };
   },
-  changeFinishState: async (ctx,next) => {
+  changeFinishState: async (ctx, next) => {
     let todo_id = ctx.request.body.todo_id;
     let finished = ctx.request.body.finished;
     console.log(finished);
@@ -525,29 +525,29 @@ module.exports = {
     console.log(state);
     let DB_res = await DB.findByIdAndUpdate("todos", todo_id, {
       finished: finished,
-      status: state
+      status: state,
     });
     ctx.body = {
       code: 0,
-      status: ""
+      status: "",
     };
   },
   /**
    * 任务清单
    */
-  addList: async (ctx,next) => {
+  addList: async (ctx, next) => {
     console.log("用户", ctx.user.user_id);
     let p = {
       user_id: ctx.user.user_id,
       project_id: ctx.request.body.project_id,
       name: ctx.request.body.name,
-      description: ctx.request.body.description
+      description: ctx.request.body.description,
     };
     let isC = await DB.findOne("todolist", { name: p.name });
     if (isC.result !== null) {
       ctx.body = {
         code: 12300,
-        errorMsg: "该清单已存在"
+        errorMsg: "该清单已存在",
       };
       return;
     }
@@ -555,24 +555,24 @@ module.exports = {
     if (result.code === 0) {
       ctx.body = {
         code: 0,
-        result: ""
+        result: "",
       };
     } else {
       ctx.body = {
         code: 99999,
-        result: result.err
+        result: result.err,
       };
     }
   },
-  getListList: async (ctx,next) => {
+  getListList: async (ctx, next) => {
     let id = ctx.query.id;
     let result = (await DB.find("todolist", { project_id: id })).result;
     ctx.body = {
       code: 0,
-      result: result
+      result: result,
     };
   },
-  getListDetail: async (ctx,next) => {
+  getListDetail: async (ctx, next) => {
     let id = ctx.query.id;
     let todoList = (await DB.findById("todolist", id)).result; //任务清单
     let todos = (await DB.find("todos", { list_id: id })).result;
@@ -588,20 +588,20 @@ module.exports = {
         updatedAt: todoList.updatedAt,
         createdAt: todoList.createdAt,
         tags: project.tags,
-        todos: todos
-      }
+        todos: todos,
+      },
     };
   },
-  deleteList: async (ctx,next) => {
+  deleteList: async (ctx, next) => {
     let id = ctx.query.id;
     await DB.deleteById("todolist", id);
     await DB.delete("todos", { list_id: id });
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  removeOutList: async (ctx,next) => {
+  removeOutList: async (ctx, next) => {
     /**
      * @将此任务对应的清单字段删除调
      */
@@ -609,24 +609,24 @@ module.exports = {
     await DB.findByIdAndUpdate("todos", id, { $unset: { list_id: "" } });
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  editList: async (ctx,next) => {
+  editList: async (ctx, next) => {
     let { list_id, project_id, name, description } = ctx.request.body;
     let condition = {
       project_id,
       name,
-      description
+      description,
     };
     await DB.findByIdAndUpdate("todolist", list_id, condition);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  archiveList: async (ctx,next) => {},
-  addSchedule: async (ctx,next) => {
+  archiveList: async (ctx, next) => {},
+  addSchedule: async (ctx, next) => {
     console.log(ctx.request.body);
     let p = {
       project_id: ctx.request.body.project_id,
@@ -636,16 +636,16 @@ module.exports = {
       startAt: new Date(ctx.request.body.startAt),
       endAt: new Date(ctx.request.body.endAt),
       notice: ctx.request.body.notice,
-      address: ctx.request.body.address
+      address: ctx.request.body.address,
     };
     const result = (await DB.insert("schedule", p)).result;
 
     ctx.body = {
       code: 0,
-      reuslt: ""
+      reuslt: "",
     };
   },
-  editSchedule: async (ctx,next) => {
+  editSchedule: async (ctx, next) => {
     let id = ctx.request.body.schedule_id;
     let p = {
       title: ctx.request.body.title,
@@ -653,36 +653,36 @@ module.exports = {
       startAt: new Date(ctx.request.body.startAt),
       endAt: new Date(ctx.request.body.endAt),
       notice: ctx.request.body.notice,
-      address: ctx.request.body.address
+      address: ctx.request.body.address,
     };
 
     const result = (await DB.findByIdAndUpdate("schedule", id, p)).result;
     ctx.body = {
       code: 0,
-      reuslt: ""
+      reuslt: "",
     };
   },
-  deleteSchedule: async (ctx,next) => {
+  deleteSchedule: async (ctx, next) => {
     let id = ctx.query.id;
     await DB.deleteById("schedule", id);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  getScheduleDetail: async (ctx,next) => {
+  getScheduleDetail: async (ctx, next) => {
     let id = ctx.query.id;
     let result = (await DB.findById("schedule", id)).result;
     ctx.body = {
       code: 0,
-      result: result
+      result: result,
     };
   },
-  getScheduleList: async (ctx,next) => {},
+  getScheduleList: async (ctx, next) => {},
   /**
    * @时间段内
    */
-  getMonthScheduleList: async (ctx,next) => {
+  getMonthScheduleList: async (ctx, next) => {
     let op = ctx.request.body.startAt;
     let ed = ctx.request.body.endAt;
     console.log(op, ed);
@@ -694,37 +694,37 @@ module.exports = {
       $or: [
         {
           startAt: {
-            $lte: ed
-          }
+            $lte: ed,
+          },
         },
         {
           endAt: {
-            $gte: ed
-          }
-        }
-      ]
+            $gte: ed,
+          },
+        },
+      ],
     };
     let list = (await DB.find("schedule", condition)).result;
     ctx.body = {
       code: 0,
-      result: list
+      result: list,
     };
   },
   /**
    * @文件
    */
-  getFileList: async (ctx,next) => {
+  getFileList: async (ctx, next) => {
     let condition = {
       user_id: ctx.user.user_id,
-      project_id: ctx.request.body.project_id
+      project_id: ctx.request.body.project_id,
     };
     let list = (await DB.find("folder", condition)).result;
     ctx.body = {
       code: 0,
-      result: result
+      result: result,
     };
   },
-  addFile: async (ctx,next) => {
+  addFile: async (ctx, next) => {
     let { name, size, type, showName, fileUrl, project_id } = ctx.request.body;
     let condition = {
       user_id: ctx.user.user_id,
@@ -733,21 +733,21 @@ module.exports = {
       size,
       type,
       fileUrl,
-      project_id
+      project_id,
     };
     console.log(condition);
     await DB.insert("folder", condition);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
   },
-  deleteFile: async (ctx,next) => {
+  deleteFile: async (ctx, next) => {
     let id = ctx.query.id;
     await DB.deleteById("folder", id);
     ctx.body = {
       code: 0,
-      result: ""
+      result: "",
     };
-  }
+  },
 };
