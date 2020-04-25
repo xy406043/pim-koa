@@ -78,6 +78,9 @@ class Db {
         });
     });
   }
+  /**
+   * @pupulate查询
+   */
   where2(table, condition, options,populate) {
     return new Promise((resolve, reject) => {
       this.connect()
@@ -103,7 +106,10 @@ class Db {
         });
     });
   }
-  where3(table, condition, options,aggregate) {
+  /**
+   * @aggregate查询
+   */
+  where3(table,aggregate) {
     console.log(aggregate)
     return new Promise((resolve, reject) => {
       this.connect()
@@ -181,6 +187,29 @@ class Db {
       this.connect()
         .then(() => {
           schema[table].findById(id,fields, options,(err, docs) => {
+            if (err) {
+              reject({ code: 1, err: err });
+            } else {
+              resolve({ code: 0, result: docs });
+            }
+          });
+        })
+        .catch(err => {
+          console.log("错误：".err);
+          reject({ code: 2, err: err });
+        });
+    });
+  }
+    /**
+   * @根据ID查找加入populate
+   * @param {*} table
+   * @param {*} obj
+   */
+  findById2(table, id,fields,options,populate) {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => {
+          schema[table].findById(id,fields, options).populate(populate|| null).exec((err, docs) => {
             if (err) {
               reject({ code: 1, err: err });
             } else {

@@ -471,7 +471,8 @@ let collection = {
         type: Schema.Types.ObjectId,
         ref: "group",
       },
-      tag:Array,  //包含 标签ID列表
+      // tag:[Schema.Types.ObjectId],
+      tag:[{type:Schema.Types.ObjectId,ref:"blog_tags"}],  //包含 标签ID列表
       isReproduced: { type: Number, default: 0 },
       isShow: { type: Number, default: 1 },
       reproduceUrl:String,

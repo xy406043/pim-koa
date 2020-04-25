@@ -1,11 +1,11 @@
 const DB = require("../../db/db-mongoose");
-
+const mongoose = require("mongoose");
 module.exports = {
   getBlogList: async (ctx) => {
     let pageSize = ctx.request.body.pageSize;
     let currentPage = ctx.request.body.currentPage;
     let condition = {
-      user_id: ctx.user.user_id,
+      user_id:new mongoose.Types.ObjectId(ctx.user.user_id),
     };
     if(  ctx.request.body.group_id){//博客必须有分类)
          condition.group_id=ctx.request.body.group_id
@@ -20,22 +20,22 @@ module.exports = {
       condition.title = { $regex: title };
     }
     let aggregate = [
-    //   {
-    //     $lookup: {
-    //       from: "group",
-    //       localField: "group_id",
-    //       foreignField: "_id",
-    //       as: "groupInfo",
-    //     }
-    //   },
-    //   {
-    //       $lookup:{
-    //           from:"tags",
-    //           localField:"tag",
-    //           foreignField:"_id",
-    //           as:"tagInfo"
-    //       }
-    //   },
+      {
+        $lookup: {
+          from: "blog_tags",
+          localField: "tag",
+          foreignField: "_id",
+          as: "tagInfo",
+        }
+      },
+      {
+        $lookup: {
+          from: "group",
+          localField: "group_id",
+          foreignField: "_id",
+          as: "groupInfo",
+        }
+      },
       {
         $match: condition,
       },
@@ -49,17 +49,25 @@ module.exports = {
         $limit: options.limit,
       },
     ];
-    console.log(aggregate)
-    const result = (await DB.where3("blog", condition, options, aggregate))
-      .result;
+    let populate=["tag","group_id"]
+    const result =(await DB.where2("blog",condition,options,populate)).result;
+    // const result = (await DB.where3("blog", aggregate))
+    let abc ={
+      user_id:ctx.user.user_id
+    }
+   let count =(await DB.count("blog",condition)).result
     ctx.body = {
       code: 0,
       result: result,
+      totalCount:count,
+      pageSize:pageSize,
+      currentPage:currentPage
     };
   },
   getBlogInfo: async (ctx) => {
     let id = ctx.query.id;
-    let result = (await DB.findById("blog", id)).result;
+    let populate =["tag","group_id"]
+    let result = (await DB.findById2("blog", id,{},{},populate)).result;
     ctx.body = {
       code: 0,
       result: result,
@@ -89,6 +97,10 @@ module.exports = {
       title: p.title,
       content: p.content,
       group_id: p.group_id,
+      tag: p.tag,
+      author:p.author,
+      isReproduced:p.isReproduced,
+      reproduceUrl:p.reproduceUrl
     };
     await DB.findByIdAndUpdate("blog", p.blog_id, data);
     ctx.body = {
@@ -127,9 +139,9 @@ module.exports = {
     //  let result =(await DB.find)
   },
   addBlogTag: async (ctx) => {
-    let {value,color} =ctx.request.body
+    let {name,color} =ctx.request.body
       let condition ={
-          name:value
+          name:name
       }
       let rel =(await DB.findOne("blog_tags",condition)).result
       if(rel){
@@ -141,7 +153,7 @@ module.exports = {
           }
       }else{
           let p={
-              name:value,
+              name:name,
               color:color
           }
          let result =(  await DB.insert("blog_tags",p)).result

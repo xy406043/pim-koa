@@ -77,7 +77,8 @@ module.exports ={
                 $limit:p.limit
             }
         ]
-        let result =(await DB.where3("notes",options,p,aggregate)).result
+        // let result =(await DB.where("notes",options,p)).result
+        let result =(await DB.where3("notes",aggregate)).result
         let count =(await DB.count("notes",options)).result
         ctx.body={
             code:0,
