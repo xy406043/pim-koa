@@ -25,26 +25,27 @@ let collection = {
       nickName: { type: String, default: "" },
       password: { type: String },
       avatar: { type: String },
-      secondCode:{type:String,default:""}, //二级密码
+      secondCode: { type: String, default: "" }, //二级密码
       colorTheme: { type: String },
       backgroundUrl: { type: String },
       access: { type: Array, default: ["user"] },
       sex: { type: Number },
-      birthDate:String,
-      nativePlace:Schema.Types.Mixed,
-      realName:String,
+      birthDate: String,
+      nativePlace: Schema.Types.Mixed,
+      realName: String,
       phone: { type: Number, default: null },
       email: { type: String, default: "" },
       address: { type: String, default: "" },
-      token: { type: String }
+      token: { type: String },
+      tags: Array, // 所有博客标签
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -54,11 +55,11 @@ let collection = {
   verify: new Schema(
     {
       ObjectId: mongoose.Schema.Types.ObjectId,
-      userName:String,
-      email:String,
-      code:String,
-      expire:Number,
-      user_id:Schema.Types.ObjectId
+      userName: String,
+      email: String,
+      code: String,
+      expire: Number,
+      user_id: Schema.Types.ObjectId,
     },
     {
       versionKey: false,
@@ -66,8 +67,8 @@ let collection = {
       collection: "verify",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -79,15 +80,15 @@ let collection = {
       user_id: mongoose.Schema.Types.ObjectId,
       projectName: String,
       remarks: {
-        type: String
+        type: String,
       },
       description: {
         type: String,
-        default: ""
+        default: "",
       },
       collected: {
         type: Boolean,
-        default: false
+        default: false,
       },
       tags: {
         type: Array,
@@ -95,13 +96,13 @@ let collection = {
           { value: "需求", color: "skyblue" },
           { value: "问题", color: "red" },
           { value: "待检验", color: "orange" },
-          { value: "处理中", color: "green" }
-        ]
+          { value: "处理中", color: "green" },
+        ],
       },
       settingInfo: {
         type: Schema.Types.Mixed,
-        default: {}
-      }
+        default: {},
+      },
       //待处理任务
     },
     {
@@ -109,8 +110,8 @@ let collection = {
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -130,18 +131,18 @@ let collection = {
       remarks: { type: String, default: "" },
       startAt: { type: Date },
       endAt: { type: Date },
-      finishedAt:{type:Date},//任务完成时间
+      finishedAt: { type: Date }, //任务完成时间
       status: { type: Number, default: 1 }, // 1.待开始 2. 进行中 3暂停中 4.已结束,
       finished: { type: Boolean, default: false },
-      collected: { type: Boolean, default: false }
+      collected: { type: Boolean, default: false },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -151,11 +152,11 @@ let collection = {
     {
       ObjectId: Schema.Types.ObjectId,
       project_id: Schema.Types.ObjectId,
-      user_id:Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
       name: String,
       description: { type: String, default: "" },
       archived: { type: Boolean, default: false },
-      collected: { type: Boolean, default: false }
+      collected: { type: Boolean, default: false },
     },
     {
       versionKey: false,
@@ -163,8 +164,8 @@ let collection = {
       collection: "todolist",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   // /**
@@ -195,16 +196,18 @@ let collection = {
       user_id: Schema.Types.ObjectId,
       title: { type: String, default: "" },
       content: { type: String, default: "" },
-      group_id:Schema.Types.ObjectId
-
+      group_id: {
+        type:Schema.Types.ObjectId
+        ,ref:"group"
+      },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -214,7 +217,7 @@ let collection = {
     {
       ObjectId: Schema.Types.ObjectId,
       user_id: Schema.Types.ObjectId,
-      title: { type: String, default: "" }
+      title: { type: String, default: "" },
     },
     {
       versionKey: false,
@@ -222,8 +225,8 @@ let collection = {
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -236,15 +239,15 @@ let collection = {
       group_id: Schema.Types.ObjectId,
       title: { type: String, default: "" },
       url: { type: String, default: "" },
-      imgUrl: { type: String, default: "" }
+      imgUrl: { type: String, default: "" },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -256,7 +259,7 @@ let collection = {
       user_id: Schema.Types.ObjectId,
       name: { type: String },
       description: { type: String },
-      groupType: { type: Number }   // 2为 网址收藏  1 为 日记本
+      groupType: { type: Number }, // 2为 网址收藏  1 为 日记本 3为博客 
     },
     {
       versionKey: false,
@@ -264,8 +267,8 @@ let collection = {
       collection: "group",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
 
@@ -278,20 +281,20 @@ let collection = {
       user_id: Schema.Types.ObjectId,
       group_id: Schema.Types.ObjectId,
       name: { type: String, default: "" },
-      qq:{type:String},
-      interest:{type:String},
-      mailAddress:{type:String},
+      qq: { type: String },
+      interest: { type: String },
+      mailAddress: { type: String },
       phoneList: { type: Array, default: [] },
       emailList: { type: Array, default: [] },
-      groupName: { type: String }
+      groupName: { type: String },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -301,7 +304,7 @@ let collection = {
     {
       ObjectId: Schema.Types.ObjectId,
       user_id: Schema.Types.ObjectId,
-      title: { type: String, default: "" }
+      title: { type: String, default: "" },
     },
     {
       versionKey: false,
@@ -309,8 +312,8 @@ let collection = {
       collection: "label",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -320,15 +323,15 @@ let collection = {
     {
       ObjectId: Schema.Types.ObjectId,
       user_id: Schema.Types.ObjectId,
-      collected: { type: Boolean, default: false }
+      collected: { type: Boolean, default: false },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
 
@@ -346,7 +349,7 @@ let collection = {
       endAt: { type: Date },
       notice: { type: Number, default: 0 }, //提醒0为不提醒 1.日程开始时 2.提前5分钟 3.提前15分钟 。。。。。
       address: { type: String, default: "" },
-      collected: { type: Boolean, default: false }
+      collected: { type: Boolean, default: false },
     },
     {
       versionKey: false,
@@ -354,8 +357,8 @@ let collection = {
       collection: "schedule",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -364,15 +367,15 @@ let collection = {
   cases: new Schema(
     {
       ObjectId: Schema.Types.ObjectId,
-      collected: { type: Boolean, default: false }
+      collected: { type: Boolean, default: false },
     },
     {
       versionKey: false,
       index: true,
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
@@ -380,13 +383,12 @@ let collection = {
    */
   codebook: new Schema(
     {
-      ObjectId:Schema.Types.ObjectId,
-      user_id:Schema.Types.ObjectId,
-      affiliation:String, //账号 从属
-      accountUrl:String,//账号Url
-      accountList:Array,
-      remarks:""    //备注
-
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      affiliation: String, //账号 从属
+      accountUrl: String, //账号Url
+      accountList: Array,
+      remarks: "", //备注
     },
     {
       versionKey: false,
@@ -394,28 +396,27 @@ let collection = {
       collection: "codebook",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
   /**
-   * @文件夹   
+   * @文件夹
    * @只保存链接以及相关信息
    */
-    folder: new Schema(
+  folder: new Schema(
     {
-      ObjectId:Schema.Types.ObjectId,
-      user_id:Schema.Types.ObjectId,
-      name:String,  //是文件的上传名，返回的链接就是这个
-      type:String,
-      size:Number,
-      fileUrl:String,
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      name: String, //是文件的上传名，返回的链接就是这个
+      type: String,
+      size: Number,
+      fileUrl: String,
       /**
        * @以下为任务集内容标识
        */
-      showName:String,//展示的文件名
-      project_id:Schema.Types.ObjectId
-
+      showName: String, //展示的文件名
+      project_id: Schema.Types.ObjectId,
     },
     {
       versionKey: false,
@@ -423,28 +424,29 @@ let collection = {
       collection: "folder",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
   ),
-   /**
-   * @网站右上角消息通知   
+  /**
+   * @网站右上角消息通知
    * @如果有后台管理系统的话倒是可以发送通知
    * @但是目前仅有这个就没有必要了
    */
   notify: new Schema(
     {
-      ObjectId:Schema.Types.ObjectId,
-      user_id:Schema.Types.ObjectId,
-      schedule_id:Schema.Types.ObjectId,
-      todo_id:Schema.Types.ObjectId,
-      title:String,
-      content:String,
-      sendTime:Date,
-      read:{  //该通知是否已经被阅读
-        type:Boolean,
-        default:false
-      }
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      schedule_id: Schema.Types.ObjectId,
+      todo_id: Schema.Types.ObjectId,
+      title: String,
+      content: String,
+      sendTime: Date,
+      read: {
+        //该通知是否已经被阅读
+        type: Boolean,
+        default: false,
+      },
     },
     {
       versionKey: false,
@@ -452,16 +454,89 @@ let collection = {
       collection: "notify",
       timestamps: {
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     }
-  )
+  ),
+  /**
+   * @博客管理
+   */
+  blog: new Schema(
+    {
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      title: { type: String, default: "" },
+      content: { type: String, default: "" },
+      group_id: {
+        type: Schema.Types.ObjectId,
+        ref: "group",
+      },
+      // tag:[Schema.Types.ObjectId],
+      tag:[{type:Schema.Types.ObjectId,ref:"blog_tags"}],  //包含 标签ID列表
+      isReproduced: { type: Number, default: 0 },
+      isShow: { type: Number, default: 1 },
+      reproduceUrl:String,
+      author: String,
+      writer: String,
+      remark: String, //备注
+    },
+    {
+      versionKey: false,
+      index: true,
+      collection: "blog",
+      timestamps: {
+        createdAt: true,
+        updatedAt: true,
+      },
+    }
+  ),
+  /**
+   * @博客标签
+   */
+  blog_tags: new Schema(
+    {
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      name: String,
+      color: String,
+    },
+    {
+      versionKey: false,
+      index: true,
+      collection: "blog_tags",
+      timestamps: {
+        createdAt: true,
+        updatedAt: true,
+      },
+    }
+  ),
+  /**
+   * @博客标签与文章映射
+   */
+  blog_tags_relationship: new Schema(
+    {
+      ObjectId: Schema.Types.ObjectId,
+      user_id: Schema.Types.ObjectId,
+      name: String,
+      blog_id: { type: Schema.Types.ObjectId, ref: "blog" },
+      tag_id: { type: Schema.Types.ObjectId, ref: "blog_tags" },
+    },
+    {
+      versionKey: false,
+      index: true,
+      collection: "blog_tags_relationship",
+      timestamps: {
+        createdAt: true,
+        updatedAt: true,
+      },
+    }
+  ),
 };
 
 module.exports = {
   collections: collection,
   users: mongoose.model("users", collection["users"]),
-  verify:mongoose.model("verify",collection["verify"]),
+  verify: mongoose.model("verify", collection["verify"]),
   projects: mongoose.model("projects", collection["projects"]),
   // knowledge: mongoose.model("knowledge", collection["knowledge"]),
   notes: mongoose.model("notes", collection["notes"]),
@@ -477,4 +552,10 @@ module.exports = {
   codebook: mongoose.model("codebook", collection["codebook"]),
   folder: mongoose.model("folder", collection["folder"]),
   notify: mongoose.model("notify", collection["notify"]),
+  blog: mongoose.model("blog", collection["blog"]),
+  blog_tags: mongoose.model("blog_tags", collection["blog_tags"]),
+  blog_tags_relationship: mongoose.model(
+    "blog_tags_relationship",
+    collection["blog_tags_relationship"]
+  ),
 };
