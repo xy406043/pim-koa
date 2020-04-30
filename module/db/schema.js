@@ -475,6 +475,7 @@ let collection = {
       tag:[{type:Schema.Types.ObjectId,ref:"blog_tags"}],  //包含 标签ID列表
       isReproduced: { type: Number, default: 0 },
       isShow: { type: Number, default: 1 },
+      mainUrl:String,
       reproduceUrl:String,
       author: String,
       writer: String,

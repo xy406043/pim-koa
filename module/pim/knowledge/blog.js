@@ -81,6 +81,7 @@ module.exports = {
       user_id: ctx.user.user_id,
       group_id: p.group_id,
       tag: p.tag,
+      mainUrl:p.mainUrl,
       author:p.author,
       isReproduced:p.isReproduced,
       reproduceUrl:p.reproduceUrl
@@ -98,6 +99,7 @@ module.exports = {
       content: p.content,
       group_id: p.group_id,
       tag: p.tag,
+      mainUrl:p.mainUrl,
       author:p.author,
       isReproduced:p.isReproduced,
       reproduceUrl:p.reproduceUrl
