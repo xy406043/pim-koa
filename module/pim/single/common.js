@@ -111,8 +111,8 @@ module.exports = {
     //要上传的空间
     const bucket = "xynagisa";
     //上传到七牛后保存的文件名
-    // const key = new Date().valueOf() + "_" + name;
-    const key = name;
+    let namel =name.split('.')
+    const key = namel[0]+'_' +  new Date().valueOf()+'.'+namel.pop();
     console.log(key);
     var putPolicy = new qiniu.rs.PutPolicy({ scope: bucket + ":" + key });
     const token = putPolicy.uploadToken();
