@@ -212,7 +212,25 @@ module.exports = {
       sort: { collected: -1 },
     };
     console.log(user_id, options);
-    let result = (await DB.where("projects", condition, options)).result;
+    let  aggregate = [
+      {
+        $match:{
+          user_id: new mongoose.Types.ObjectId(ctx.user.user_id)
+        }
+      },
+      {
+         $sort:{
+             createdAt:-1
+         }
+      },
+      {
+        $sort:{
+          collected:-1,
+        }
+      }
+    ]
+    // let result = (await DB.where("projects", condition, options)).result;
+    let result = (await DB.where3("projects",aggregate)).result
     ctx.body = {
       code: 0,
       result: result,
@@ -228,18 +246,44 @@ module.exports = {
     let id = ctx.query.id;
     let all_todo = {};
     let result = (await DB.findById("projects", id)).result;
-    let lists = (await DB.find("todolist", { project_id: id })).result;
-    //清单外任务
-    let todo = (
-      await DB.where(
-        "todos",
-        {
-          project_id: id,
+    let aggregate =[
+      {
+        $match:{
+          project_id:new mongoose.Types.ObjectId(id)
+        }
+      },
+      {
+        $lookup:{
+          from:"todos",
+          localField:"_id",
+          foreignField:"list_id",
+          as:"todoList"
+        }
+      },
+      {
+        $sort:{createdAt:-1}
+      }
+    ]
+    // let lists = (await DB.find("todolist", { project_id: id })).result;
+    let lists =(await DB.where3("todolist",aggregate)).result
+    let aggregate1 =[
+      {
+        $match:{
+          project_id: new mongoose.Types.ObjectId(id),
           list_id: { $exists: false },
           parent_todo: { $exists: false },
-        },
-        { sort: { status: 1 } }
-      )
+        }
+      },
+      {
+        $sort:{createdAt:-1}
+      },
+      {
+        $sort:{status:1}
+      }
+    ]
+    //清单外任务
+    let todo = (
+      await DB.where3("todos",aggregate1)
     ).result;
     all_todo["offList"] = {
       todoList: todo,
@@ -249,22 +293,21 @@ module.exports = {
      * @不好在这里循环使用异步函数
      * @不然前端接受到的数据会缺少
      */
+    function mySort1(){
+      return function(a,b){
+         return new Date(b['createdAt']).valueOf() - new Date(a['createdAt']).valueOf()
+      }
+    }
+    function mySort2(){
+      return function(a,b){
+        return a['status']-b['status']
+      }
+    }
     for (let item of lists) {
-      const every_list = (
-        await DB.where(
-          "todos",
-          {
-            list_id: item._id,
-            parent_todo: { $exists: false },
-          },
-          { sort: { status: 1 } }
-        )
-      ).result;
-      all_todo[item.name] = {
-        list_id: item._id,
-        description: item.description,
-        todoList: every_list,
-      };
+     
+      all_todo[item.name] =item
+      all_todo[item.name].list_id=item._id
+      all_todo[item.name].todoList=item.todoList.sort((a,b)=>{return new Date(b['createdAt']).valueOf() - new Date(a['createdAt']).valueOf() }).sort((a,b)=>{return a['status']-b['status']})
     }
 
     let schedule = (
