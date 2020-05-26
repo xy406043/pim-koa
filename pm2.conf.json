@@ -5,8 +5,7 @@
     "script": "bin/www",
     "watch": true,
     "ignore_watch":[
-      "node_modules",
-      "logs"
+      "node_modules"
     ],
     "instances":1,
     "error_file":"../logs/pim/logs/err.log",
