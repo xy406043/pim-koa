@@ -16,7 +16,7 @@ module.exports ={
        let pass =ctx.request.body.password
        console.log(pass)
        let user_id =ctx.user.user_id
-       await DB.findByIdAndUpdate("users",user_id,{secondCode:Crypto.decode(pass)})
+       await DB.findByIdAndUpdate("users",user_id,{secondCode:pass})
        ctx.body={
            code:0,
            result:""
@@ -26,8 +26,10 @@ module.exports ={
         let pass =ctx.request.body.password
         let user_id =ctx.user.user_id
         let result =(await DB.findById("users",user_id)).result
-        console.log(Crypto.decode(pass))
-        if(Crypto.decode(pass)!==result.secondCode){
+        if(Crypto.decode(pass)===result.secondCode){
+            await DB.findByIdAndUpdate("users",user_id,{secondCode:pass})
+        }
+        if(pass!==result.secondCode){
            ctx.body={
                code:-1,
                errMsg:"密码错误"
