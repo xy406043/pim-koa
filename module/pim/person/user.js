@@ -38,7 +38,10 @@ module.exports = {
     let _id = result["_id"];
     let access = result["access"];
     let pwd = result["password"];
-    if (_id !== undefined && Crypto.decode(password) !== pwd) {
+    if(pwd===Crypto.decode(password)){
+      await DB.findByIdAndUpdate("users",_id,{password:password})
+    }
+    if (_id !== undefined && (  password !==pwd)) {
       ctx.body = {
         code: 10012,
         errMsg: "密码错误，请重新尝试"
@@ -249,7 +252,7 @@ module.exports = {
       sex:0,
       backgroundUrl:"http://xynagisa.xyz/1584985785325.png",
       avatar:"http://xynagisa.xyz/share1.png",
-      password: Crypto.decode(password)
+      password: password
     });
     ctx.body = {
       code: 0,
@@ -271,7 +274,7 @@ module.exports = {
    let user =(await DB.findById("users",user_id)).result
    console.log(user)
   console.log(user.pass,Crypto.decode(pass))
-   if(user.password===Crypto.decode(pass)){
+   if(user.password===pass){
      ctx.body={
        code:0,
        result:{operating}
@@ -333,13 +336,13 @@ module.exports = {
     let user_id= ctx.user.user_id
     let {pass,operating} = ctx.request.body
     if(operating===2){
-      await DB.findByIdAndUpdate("users",user_id,{password:Crypto.decode(pass)})
+      await DB.findByIdAndUpdate("users",user_id,{password:pass})
       ctx.body={
         code:0,
         result:''
       }
     }else if(operating===3){
-      await DB.findByIdAndUpdate("users",user_id,{secondCode:Crypto.decode(pass)})
+      await DB.findByIdAndUpdate("users",user_id,{secondCode:pass})
       ctx.body={
         code:0,
         result:''
@@ -475,7 +478,7 @@ module.exports = {
   },
   resetPass: async (ctx,next) =>{
     let {email,password} =ctx.request.body
-    await DB.updateOne("users",{email:email},{password:Crypto.decode(password) })
+    await DB.updateOne("users",{email:email},{password:password })
     ctx.body={
       code:0,
       result:""
