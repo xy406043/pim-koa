@@ -10,6 +10,7 @@ const logger = require("koa-logger");
 const index = require("./routes/index");
 const { verifyToken } = require("./libs/token");
 const socketJs = require("./module/pim/socket")
+const koajwt =require("koa-jwt")
 // const cors = require("koa2-cors");
 // const history = require('./middleware/koa2-connect-history-api-fallback')
 // app.use(history({
@@ -137,6 +138,28 @@ app.use(async (ctx, next) => {
  * 中间件的执行顺序
  * 123321 ---
  */
+
+// 错误处理
+app.use((ctx, next) => {
+  return next().catch((err) => {
+      if(err.status === 401){
+          ctx.status = 401
+        ctx.body = {
+          code:1 ,
+          errorMsg:'Protected resource, use Authorization header to get access\n'
+        }
+      }else{
+          throw err;
+      }
+  })
+})
+
+app.use(koajwt({
+secret: 'PimToken'
+}).unless({
+path: [/\/user\/login/]
+}));
+
 app.use(async (ctx, next) => {
   await verifyToken(ctx, next); // !!! async await
   await next();

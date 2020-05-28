@@ -29,7 +29,7 @@ const verifyToken = async (ctx, next) => {
           user_id: payload.id
         };
         // error handler
-        console.log(ctx.user);
+        console.log("全局用户信息" ,ctx.user);
       } else {
         ctx.body = {
           code: 90003,
@@ -37,14 +37,12 @@ const verifyToken = async (ctx, next) => {
         };
       }
     } catch (err) {
+      console.log("错误补货",err)
       /**
        * 过期处理？？？
        */
-      // throw 401
-      ctx.body = {
-        code: 90001,
-        errorMsg: "登录无效"
-      };
+      throw 403
+      ctx.status = 200
     }
   }
 };

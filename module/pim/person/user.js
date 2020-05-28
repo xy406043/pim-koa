@@ -55,7 +55,7 @@ module.exports = {
     };
     let secret = "PimToken";
 
-    const token = jwt.sign(payload, secret, { expiresIn: "1000h" });
+    const token = jwt.sign(payload, secret, { expiresIn: "72h" });
     await DB.updateOne("users", { userName }, { token });
     ctx.body = {
       code: 0,
