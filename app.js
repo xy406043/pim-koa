@@ -11,10 +11,10 @@ const index = require("./routes/index");
 const { verifyToken } = require("./libs/token");
 const socketJs = require("./module/pim/socket")
 // const cors = require("koa2-cors");
-const history = require('./middleware/koa2-connect-history-api-fallback')
-app.use(history({
-verbose: true//打出转发日志
-}));
+// const history = require('./middleware/koa2-connect-history-api-fallback')
+// app.use(history({
+// verbose: true//打出转发日志
+// }));
 /**
  * @建立socket链接
  */
