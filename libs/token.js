@@ -8,6 +8,7 @@ const verifyToken = async (ctx, next) => {
   // console.log(ctx.header)
 
   let token =   ctx.header.authorization;
+  console.log("juan",token)
   if (token) {
     try {
       let payload = await jwt.verify(token.split(" ")[1], "PimToken");
@@ -41,8 +42,7 @@ const verifyToken = async (ctx, next) => {
       /**
        * 过期处理？？？
        */
-      throw 403
-      ctx.status = 200
+      ctx.throw(401)
     }
   }
 };

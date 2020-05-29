@@ -139,6 +139,10 @@ app.use(async (ctx, next) => {
  * 123321 ---
  */
 
+
+
+
+
 // 错误处理
 app.use((ctx, next) => {
   return next().catch((err) => {
@@ -154,16 +158,17 @@ app.use((ctx, next) => {
   })
 })
 
-app.use(koajwt({
-secret: 'PimToken'
-}).unless({
-path: [/\/user\/login/]
-}));
-
 app.use(async (ctx, next) => {
   await verifyToken(ctx, next); // !!! async await
   await next();
 });
+
+// app.use(koajwt({
+// secret: 'PimToken'
+// }).unless({
+// path: [/\/user\/login/]
+// }));
+
 /**
  * 模板引擎
  * 前端用的Vue，这里就不管了
